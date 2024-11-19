@@ -11,11 +11,42 @@ model User {
   id       Int       @id @default(autoincrement())
   email    String    @unique
   name     String
+  recipes  Recipe[]  // One-to-many relationship between User and Recipe
+  favouriteRecipe FavouriteRecipeUser[] // One-to-many relationship between User and FavouriteRecipe
+}
+
+model FavouriteRecipeUser {
+  id                Int                  @id @default(autoincrement())
+  recipeID          Int?                  // Foreign key to Recipe
+  userID            Int?                  // Foreign key to User
+  favourite         Boolean
+  user              User?                 @relation(fields: [userID], references: [id]) // Many-to-one with Users
+  recipe            Recipe?               @relation(fields: [recipeID], references: [id]) // one-to-one with Recipes
 }
 
 model Recipe {
   id              Int               @id @default(autoincrement())
   title           String
-  ingredients     String
-  favourite       Boolean            @default(false)
+  ingredients     RecipeIngredient[]    // One-to-many relationship with RecipeIngredient
+  category        String
+  notes           String?
+  authorId        Int                 // foreign key
+  author          User               @relation(fields: [authorId], references: [id])
+  favouriteRecipe FavouriteRecipeUser[] // One-to-one relationship with FavouriteRecipe
+}
+
+model RecipeIngredient {
+  id           Int        @id @default(autoincrement())
+  recipeId     Int        // Foreign key to Recipe
+  ingredientId Int        // Foreign key to Ingredient
+  quantity     String     // Define any other details specific to this Recipe-Ingredient link
+
+  recipe       Recipe     @relation(fields: [recipeId], references: [id]) // Many-to-one with Recipe
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id]) // Many-to-one with Ingredient
+}
+
+model Ingredient {
+  id          Int                @id @default(autoincrement())
+  title       String
+  recipeUses  RecipeIngredient[] // Many-to-one relationship with RecipeIngredient
 }
