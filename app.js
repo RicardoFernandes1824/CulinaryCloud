@@ -50,6 +50,48 @@ app.patch("/users/:id", async (req, response) => {
     response.json(updateUser)
 });
 
+// Create Ingredient + return newIngredient
+app.post("/ingredients", async (req, response) => {
+    const newIngredient = await prisma.ingredient.create({
+        data:{
+            name: req.body.name
+        }
+    })
+    console.log(newIngredient)
+    response.json(newIngredient)
+})
+
+// Return All Ingredients or by Name Query
+app.get("/ingredients", async (req, response) => {
+    if(!req.query.name) {
+        const ingredients = await prisma.ingredient.findMany()
+        console.log(ingredients)
+        response.json(ingredients)
+    } else {
+        const searchIngredients = await prisma.ingredient.findMany({
+            where: {
+                name: {
+                    contains: req.query.name,
+                    mode: 'insensitive'
+                }
+            }
+        })
+        response.json(searchIngredients)
+        console.log(searchIngredients)
+    }
+});
+
+// test get all or one recipe by UserID                           Possiveis Updates Futuros apos solucionar o criar receitas
+app.get("/users/:id/recipe", async (req, response) => {
+    const getUserRecipes = await prisma.user.findMany({
+        where: {
+            id: +req.params.id
+        },
+    })
+    console.log(getUserRecipes)
+    response.json(getUserRecipes)
+});
+
 // test update recipe by UserID                           Possiveis Updates Futuros apos solucionar o criar receitas
 app.patch("/users/:id/recipe", async (req, response) => {
     const updateUserNotes = await prisma.user.update({
@@ -76,10 +118,10 @@ app.get("/recipe", async (request, response) => {
 
 // testar Create Recipe + Return Camps
 app.post("/recipe", async (req, response) => {
-    const ingredientes = [1,2,3]
+    const ingredients = 
     const newRecipe = await prisma.recipe.create({
         data:{
-            title: req.body.title,
+            name: req.body.name,
             ingredients: null,
             category: req.body.category,
             notes: req.body.notes,
@@ -99,19 +141,6 @@ app.post("/recipe", async (req, response) => {
     }
     console.log(newRecipe)
     response.json(newRecipe)
-
-});
-
-// testar create recipe
-app.post("/recipe", async (request, response) => {
-    const recipes = await prisma.recipe.create({
-        data: {
-            title: 'Arroz',
-            ingredients: 'Arroz, Chocolate, Banana',
-        },
-    })
-    console.log(recipes)
-    response.json(recipes)
 });
 
 
