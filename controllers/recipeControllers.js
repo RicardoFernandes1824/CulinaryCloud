@@ -7,15 +7,12 @@ const getAllRecipesByUser = async (req, response) => {
             authorId: +req.params.id
         },
     })
-    console.log(getUserRecipes)
     response.json(getUserRecipes)
 }
 
-const getAllRecipes =async (request, response) => {
+const getAllRecipes = async (request, response) => {
     // Get all recipes with the ingredients included
     const query = request.query;
-
-    console.log(query)
 
     let recipes;
 
@@ -23,9 +20,7 @@ const getAllRecipes =async (request, response) => {
         public: true
     }];
 
-
-
-    if (!request.query) {
+    if (!request.query.length > 0) {
         recipes = await prisma.recipe.findMany({
             where: {
                 AND: filters
@@ -150,7 +145,6 @@ const getAllRecipes =async (request, response) => {
         })
     });
 
-    console.log(recipes)
     response.json(recipes)
 }
 
@@ -188,7 +182,6 @@ const createRecipe = async (req, response) => {
 
         },
     })
-    console.log(newRecipe)
     response.json(newRecipe)
 }
 
@@ -206,7 +199,6 @@ const updateRecipeByUser = async (req, response) => {
             public: req.body.public
         },
     })
-    console.log(updateUserRecipe)
     response.json(updateUserRecipe)
 }
 
@@ -218,7 +210,6 @@ const deleteRecipe = async (req, response) => {
         }
     })
 
-    console.log("Recipe deleted: " + deleteRecipe)
     response.json("Recipe deleted: " + deleteRecipe)
 }
 

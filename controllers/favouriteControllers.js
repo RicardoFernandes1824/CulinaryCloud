@@ -13,7 +13,6 @@ const addFavouriteRecipe = async (req, response) => {
 
 const getFavouritesByID = async (req, response) => {
     const query = req.query;
-    console.log(query)
 
     let favouriteByUser;
     let receitas;
@@ -28,11 +27,7 @@ const getFavouritesByID = async (req, response) => {
             }
         })
 
-        console.log(favouriteByUser)
-
         const ids = favouriteByUser.map((favourite) => favourite.recipeID)
-
-        console.log(ids)
 
         receitas = await prisma.recipe.findMany({
             where: {
@@ -93,7 +88,6 @@ const getFavouritesByID = async (req, response) => {
             }
         })
     }
-    console.log(receitas)
     response.json(receitas)
 }
 
