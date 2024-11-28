@@ -1,10 +1,7 @@
 const express = require('express');
 const usersRouter = express.Router();
-const usersController = require('../controllers/usersController');
-const verifyJWT = require('../middleware/verifyJWT');
-const { getAllUsers } = require('../controllers/usersController');
-const { createUser } = require('../controllers/usersController');
-const { updateUser } = require('../controllers/usersController');
+const { getAllUsers, updateUser, createUser, getUserById } = require('../controllers/usersControllers');
+const verifyJWT = require('../middleware/verifyJWT'); // nao sei se vou usar
 
 
 usersRouter.get('/users', getAllUsers)

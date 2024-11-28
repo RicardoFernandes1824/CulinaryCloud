@@ -10,6 +10,7 @@ generator client {
 model User {
   id              Int                   @id @default(autoincrement())
   email           String                @unique
+  password        String
   name            String
   recipes         Recipe[] // One-to-many relationship between User and Recipe
   favouriteRecipe FavouriteRecipeUser[] // One-to-many relationship between User and FavouriteRecipe

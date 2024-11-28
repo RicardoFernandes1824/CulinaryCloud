@@ -1,5 +1,5 @@
 const express = require('express')
-const {getIngredients, createIngredients} = require("../controllers/ingredientsController")
+const {getIngredients, createIngredients} = require('../controllers/ingredientsControllers')
 const ingredientsRouter = express.Router()
 
 ingredientsRouter.get('/ingredients', getIngredients)

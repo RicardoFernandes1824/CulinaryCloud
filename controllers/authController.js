@@ -1,47 +1,41 @@
-const usersDB = {
-    users: require('../prisma/schema.prisma'), // DEVE ESTAR MAL
-    setUsers: function (data) {this.users = data}
-}
+const prisma = require('../utils/prisma')
+const bcryt = require('bcrypt');
+const jwt = require('jsonwebtoken')
 
+const login = async (request, response) => {
+    const { email, password } = request.body;
 
-const jwt = require('jsonwebtoken');
-require('dotenv').config();
-const fsPromises = require('fs').promises;
-const path = require('path');
+    const findUser = await prisma.user.findUnique({
+        where: {
+            email: email
+        }
+    })
 
-
-const handleLogin = async (req,response) => {
-    const { user, password } = req.body;
-    if(!user || !password) return response.status(400).json({ 'message': 'Username and password are required!'})
-    const foundUser = usersDB.users.find(user === user.name); // nao faço puta ideia
-    if(!foundUser) return response.sendStatus(401); //Unauthorized
-    //evaluate password
-    const match = await bcryt.compare(password, foundUser.password);
-    if(match) {
-        // Create JWTs
-        const accessToken = jwt.sign(
-            {"username": foundUser.username },
-            process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: '300s' }
-        );
-        const refreshToken = jwt.sign(
-            {"username": foundUser.username },
-            process.env.REFRESH_TOKEN_SECRET,
-            { expiresIn: '1d' }
-        );
-        // Saving refreshToken with current user
-        const otherUsers = usersDB.users.filter(person??? => person.username????? !== foundUser.username);
-        const currentUser = {... foundUser, refreshToken };
-        usersDB.setUsers([...otherUsers,currentUser]);
-        await fsPromises.writeFile( // Nao faço puta idei do que e isto
-            path.join(_dirname, '..', 'model', 'users.json'),
-            JSON.stringify(usersDB.users)
-        );
-        response.cookie('jwt', refreshToken, {httpOnly: true, maxAge: 24 * 60 * 60 * 1000}) // milliseconds
-        response.json({ accessToken });
-    } else {
-        response.sendStatus(401);
+    if(!findUser) {
+        return response.sendStatus(401)
     }
+
+    const validPassword = await bcryt.compare(password, findUser.password);
+
+    if(!validPassword) {
+        return response.status(403).json({
+            message: "Wrong password"
+        })
+    }
+
+    const accessToken = jwt.sign(
+        {"email": findUser.email, "id": findUser.id },
+        process.env.JWT_SECRET,
+        { expiresIn: '1d' }
+    );
+
+    response.json({
+        message: "Enjoy your access token!",
+        token: accessToken
+    })
+
 }
 
-module.exports = {handleLogin};
+module.exports = {
+    login
+}
