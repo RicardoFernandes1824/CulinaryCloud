@@ -1,19 +1,18 @@
 const express = require('express');
-const router = express.Router();
+const usersRouter = express.Router();
 const usersController = require('../controllers/usersController');
 const verifyJWT = require('../middleware/verifyJWT');
+const { getAllUsers } = require('../controllers/usersController');
+const { createUser } = require('../controllers/usersController');
+const { updateUser } = require('../controllers/usersController');
 
 
+usersRouter.get('/users', getAllUsers)
+usersRouter.post('/users', createUser)
+usersRouter.get('/users/:id', getUserById)
+usersRouter.patch('/users/:id', updateUser)
 
-// tenho de criar as rotas
 
-router.route('/')
-.get()
-.post()
-.put()
-.delete();
-
-router.route('/:id')
-.get();
-
-module.exports = router;
+module.exports = {
+    usersRouter
+}

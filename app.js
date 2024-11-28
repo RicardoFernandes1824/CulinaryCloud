@@ -7,6 +7,8 @@ app.use(express.json());
 app.use(fileUpload());
 const verifyJWT = require('./middleware/verifyJWT');
 const bcryt = require('bcrypt');
+const { ingredientsRouter } = require('./routes/ingredients');
+const { usersRouter } = require('./routes/users');
 
 
 const port = process.env.PORT || 8080;
@@ -43,79 +45,9 @@ app.post("/login", async (request, response) => {
 
 })
 
+app.use(usersRouter)
 
-// Return All Users
-app.get("/users", async (request, response) => {
-    const users = await prisma.user.findMany()
-    console.log(users)
-    response.json(users)
-});
-
-// Return  User by ID
-app.get("/users/:id", async (req, response) => {
-    const userbyID = await prisma.user.findUnique({
-        where: {
-            id: +req.params.id
-        },
-    })
-    console.log(userbyID)
-    response.json(userbyID)
-});
-
-// Create User + return camps
-app.post("/users", async (req, response) => {
-    const newUser = await prisma.user.create({
-        data: {
-            email: req.body.email,
-            name: req.body.name
-        }
-    })
-    console.log(newUser)
-    response.json(newUser)
-});
-
-// Update user by ID
-app.patch("/users/:id", async (req, response) => {
-    const updateUser = await prisma.user.update({
-        where: {
-            id: +req.params.id //+ transforms the string in Int
-        },
-        data: req.body
-    })
-    console.log(updateUser)
-    response.json(updateUser)
-});
-
-// Create Ingredient + return newIngredient
-app.post("/ingredients", async (req, response) => {
-    const newIngredient = await prisma.ingredient.create({
-        data: {
-            name: req.body.name
-        }
-    })
-    console.log(newIngredient)
-    response.json(newIngredient)
-})
-
-// Return All Ingredients or by Name Query
-app.get("/ingredients", async (req, response) => {
-    if (!req.query.name) {
-        const ingredients = await prisma.ingredient.findMany()
-        console.log(ingredients)
-        response.json(ingredients)
-    } else {
-        const searchIngredients = await prisma.ingredient.findMany({
-            where: {
-                name: {
-                    contains: req.query.name,
-                    mode: 'insensitive'
-                }
-            }
-        })
-        response.json(searchIngredients)
-        console.log(searchIngredients)
-    }
-});
+app.use(ingredientsRouter);
 
 // test get all or one recipe by UserID
 app.get("/users/:id/recipe", async (req, response) => {
