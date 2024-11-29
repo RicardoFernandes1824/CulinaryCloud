@@ -205,8 +205,8 @@ const updateRecipeByUser = async (req, response) => {
 const deleteRecipe = async (req, response) => {
     const deleteRecipe = await prisma.recipe.delete({
         where: {
-            authorId: +req.params.userId,
-            id: +req.params.recipeId
+            authorId: +req.params.authorId,
+            id: +req.params.id
         }
     })
 

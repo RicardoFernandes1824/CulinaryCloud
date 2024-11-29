@@ -10,7 +10,7 @@ recipeRouter.post('/recipe', createRecipe)
 
 recipeRouter.patch('/users/:authorId/recipe/:id', updateRecipeByUser)
 
-recipeRouter.delete('/users/:userId/recipe/:recipeId', deleteRecipe)
+recipeRouter.delete('/users/:authorId/recipe/:id', deleteRecipe)
 
 module.exports = {
     recipeRouter
