@@ -4,7 +4,7 @@ const addFavouriteRecipe = async (req, response) => {
     const favouriteRecipe = await prisma.favouriteRecipeUser.create({
         data: {
             recipeID: req.body.recipeID,
-            userID: req.body.userID // alterar eventualmente para o token 
+            userID: req.body.userID
         }
     })
     console.log("The User " + req.body.userID + "added this recipe as favourite:" + req.body.recipeID)

@@ -210,7 +210,7 @@ const deleteRecipe = async (req, response) => {
         }
     })
 
-    response.json("Recipe deleted: " + deleteRecipe)
+    response.json("Recipe deleted")
 }
 
 module.exports = {

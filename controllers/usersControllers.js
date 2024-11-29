@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 
 const getAllUsers = async (request, response) => {
     const users = await prisma.user.findMany()
+    delete(updateUser.password)
     response.json(users)
 }
 
@@ -44,6 +45,7 @@ const getUserById = async (req, response) => {
             id: +req.params.id
         },
     })
+    delete(updateUser.password)
     response.json(userbyID)
 }
 
