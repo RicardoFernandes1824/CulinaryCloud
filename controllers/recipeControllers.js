@@ -1,14 +1,20 @@
 const prisma = require('../utils/prisma')
+const path = require('path');
 
 
 const getAllRecipesByUser = async (req, response) => {
-    const getUserRecipes = await prisma.recipe.findMany({
-        where: {
-            authorId: +req.params.id
-        },
-    })
-    response.json(getUserRecipes)
-}
+    try {
+        const getUserRecipes = await prisma.recipe.findMany({
+            where: {
+                authorId: +req.params.id, 
+            },
+        });
+        response.json(getUserRecipes); 
+    } catch (error) {
+        console.error(error);
+        response.status(500).json({ error: 'An error occurred while fetching recipes' });
+    }
+};
 
 const getAllRecipes = async (request, response) => {
     // Get all recipes with the ingredients included
@@ -150,6 +156,24 @@ const getAllRecipes = async (request, response) => {
 
 const createRecipe = async (req, response) => {
     const ingredients = req.body.ingredients;
+    let coverImage;
+
+    if ((!req.files || Object.keys(req.files).length === 0) && !req.body.coverImage) {
+        coverImage = 'https://st3.depositphotos.com/13324256/17303/i/450/depositphotos_173034766-stock-photo-woman-writing-down-recipe.jpg';
+    } else if (req.files && req.files.sampleFile) {
+        const sampleFile = req.files.sampleFile;
+        const photo = req.files.sampleFile.name;
+
+        const path = `./attachements/${photo}`
+
+        sampleFile.mv(path, function (err) {
+            if (err)
+                return response.status(500).send(err);
+        });
+
+        coverImage = path;
+    }
+
     const newRecipe = await prisma.recipe.create({
         data: {
             name: req.body.name,
@@ -157,6 +181,7 @@ const createRecipe = async (req, response) => {
             notes: req.body.notes,
             authorId: req.body.authorId,
             public: req.body.public,
+            coverImage: coverImage.split("./attachements/")[1],
             ingredients: {
                 create: ingredients.map((ingredient) => {
                     if (ingredient.id) {
@@ -178,6 +203,7 @@ const createRecipe = async (req, response) => {
                         quantity: ingredient.quantity
                     };
                 })
+            
             }
 
         },
@@ -186,6 +212,21 @@ const createRecipe = async (req, response) => {
 }
 
 const updateRecipeByUser = async (req, response) => {
+    let coverImage;
+    if (req.files && req.files.sampleFile) {
+        const sampleFile = req.files.sampleFile;
+        const photo = req.files.sampleFile.name;
+
+        const path = `./attachements/${photo}`
+
+        sampleFile.mv(path, function (err) {
+            if (err)
+                return response.status(500).send(err);
+        });
+
+    coverImage = path;
+}
+
     const updateUserRecipe = await prisma.recipe.update({
         where: {
             id: +req.params.id,
@@ -196,7 +237,8 @@ const updateRecipeByUser = async (req, response) => {
             ingredients: req.body.ingredients,
             category: req.body.category,
             notes: req.body.notes,
-            public: req.body.public
+            public: req.body.public,
+            coverImage: coverImage.split("./attachements/")[1]
         },
     })
     response.json(updateUserRecipe)

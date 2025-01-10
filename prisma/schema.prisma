@@ -31,10 +31,11 @@ model Recipe {
   attachements recipeAttachements[]
   category     String
   notes        String?
+  coverImage   String?
   createdAt    DateTime             @default(now())
   updatedAt    DateTime             @updatedAt
   public       Boolean              @default(false)
-  authorId     Int // foreign key
+  authorId     Int                // foreign key
   author       User                 @relation(fields: [authorId], references: [id])
 }
 
@@ -42,7 +43,6 @@ model RecipeIngredient {
   recipeId     Int // Foreign key to Recipe
   ingredientId Int // Foreign key to Ingredient
   quantity     String // Define any other details specific to this Recipe-Ingredient link
-
   recipe     Recipe     @relation(fields: [recipeId], references: [id], onDelete: Cascade) // Many-to-one with Recipe
   ingredient Ingredient @relation(fields: [ingredientId], references: [id]) // Many-to-one with Ingredient
 
