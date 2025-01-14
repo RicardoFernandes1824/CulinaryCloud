@@ -4,12 +4,35 @@ const path = require('path');
 
 const getAllRecipesByUser = async (req, response) => {
     try {
+        const userId = +req.params.id; // Assume userId is passed as a parameter
+
         const getUserRecipes = await prisma.recipe.findMany({
             where: {
-                authorId: +req.params.id,
+                authorId: userId,
+            },
+            include: {
+                ingredients: true, // Include ingredients
+                attachements: true, // Include attachments
+                author: true, // Include author details
             },
         });
-        response.json(getUserRecipes);
+
+        // Add the isFavorite field to each recipe
+        const recipesWithFavorites = await Promise.all(
+            getUserRecipes.map(async (recipe) => {
+                const isFavorite = await prisma.favouriteRecipeUser.findFirst({
+                    where: {
+                        recipeID: recipe.id,
+                        userID: userId,
+                    },
+                });
+                return {
+                    ...recipe,
+                    isFavorite: !!isFavorite, // true if found, false otherwise
+                };
+            })
+        );
+        response.json(recipesWithFavorites);
     } catch (error) {
         console.error(error);
         response.status(500).json({ error: 'An error occurred while fetching recipes' });

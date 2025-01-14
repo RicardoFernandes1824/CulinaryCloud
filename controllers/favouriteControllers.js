@@ -40,6 +40,9 @@ const getFavouritesByID = async (req, response) => {
                     id: {
                         in: ids
                     }
+                },
+                include:{
+                    author: true
                 }
             })
         } else {
