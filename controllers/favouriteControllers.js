@@ -1,20 +1,20 @@
 const prisma = require('../utils/prisma')
 
 const addFavouriteRecipe = async (req, response) => {
-    try {
-        const favouriteRecipe = await prisma.favouriteRecipeUser.create({
-            data: {
-                recipeID: req.body.recipeID,
-                userID: req.body.userID
-            }
-        })
-        console.log("The User " + req.body.userID + "added this recipe as favourite:" + req.body.recipeID)
-        response.json("The User " + req.body.userID + "added this recipe as favourite:" + req.body.recipeID)
-    } catch (error) {
-        console.log(error)
-        response.json("Error adding favourite recipe")
-    }
-}
+        const { userId, recipeId } = req.body;
+        try {
+            const favorite = await prisma.favouriteRecipeUser.create({
+                data: {
+                    userID: +userId,
+                    recipeID: +recipeId,
+                },
+            });
+            response.status(201).json(favorite);
+        } catch (error) {
+            console.error(error);
+            response.status(500).json({ error: 'Failed to add favorite' });
+        }
+    };
 
 const getFavouritesByID = async (req, response) => {
     try {
@@ -104,7 +104,26 @@ const getFavouritesByID = async (req, response) => {
     }
 }
 
+
+const deleteFavouritesByID = async (req, response) => {
+    const { recipeId } = req.params;
+    const { userId } = req.body; 
+    try {
+        await prisma.favouriteRecipeUser.deleteMany({
+            where: {
+                recipeID: +recipeId,
+                userID: userId,
+            },
+        });
+        response.status(204).send();
+    } catch (error) {
+        console.error(error);
+        response.status(500).json({ error: 'Failed to remove favorite' });
+    }
+};
+
 module.exports = {
     addFavouriteRecipe,
-    getFavouritesByID
+    getFavouritesByID,
+    deleteFavouritesByID
 }

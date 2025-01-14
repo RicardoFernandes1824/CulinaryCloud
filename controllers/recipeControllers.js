@@ -43,10 +43,14 @@ const getAllPublicRecipesByUser = async (req, response) => {
     try {
         const getUserRecipes = await prisma.recipe.findMany({
             where: {
-                isPublic: true,  // Assuming 'isPublic' is a field that indicates visibility
+                public: true,
                 authorId: {
                     not: +req.params.id,  // Exclude the user's own recipes
                 },
+            }, include: {
+                ingredients: true, // Include ingredients
+                attachements: true, // Include attachments
+                author: true, // Include author details
             },
         });
         response.json(getUserRecipes);
@@ -315,7 +319,32 @@ const deleteRecipe = async (req, response) => {
     }
 }
 
-const getRecipeByUserById = async (req, response) => {
+const getPublicRecipeById = async (req, response) => {
+    try {
+        console.log(req.params)
+        const getUserRecipe = await prisma.recipe.findUnique({
+            where: {
+                id: +req.params.id,
+                public: true
+            },
+            include: {
+                ingredients: {
+                    include: {
+                        ingredient: true
+                    }
+                },
+                attachements: true
+            }
+        });
+        console.log(getUserRecipe)
+        response.json(getUserRecipe);
+    } catch (error) {
+        console.error(error);
+        response.status(500).json({ error: 'An error occurred while fetching a recipe' });
+    }
+};
+
+const getRecipeByUser = async (req, response) => {
     try {
         const getUserRecipe = await prisma.recipe.findUnique({
             where: {
@@ -330,20 +359,21 @@ const getRecipeByUserById = async (req, response) => {
                 },
                 attachements: true
             }
-        });
+        })
         response.json(getUserRecipe);
-    } catch (error) {
+    }catch (error) {
         console.error(error);
         response.status(500).json({ error: 'An error occurred while fetching a recipe' });
     }
-};
+}
 
 module.exports = {
     createRecipe,
     updateRecipeByUser,
     getAllPublicRecipesByUser,
-    getRecipeByUserById,
+    getPublicRecipeById,
     getAllRecipes,
     getAllRecipesByUser,
+    getRecipeByUser,
     deleteRecipe
 }

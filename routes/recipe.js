@@ -1,5 +1,5 @@
 const express = require('express');
-const { createRecipe, updateRecipeByUser, getRecipeByUserById, getAllPublicRecipesByUser, getAllRecipesByUser, getAllRecipes, deleteRecipe } = require('../controllers/recipeControllers');
+const { createRecipe, updateRecipeByUser, getPublicRecipeById, getAllPublicRecipesByUser, getAllRecipesByUser, getRecipeByUser, getAllRecipes, deleteRecipe } = require('../controllers/recipeControllers');
 const recipeRouter = express.Router();
 
 recipeRouter.get('/recipe', getAllRecipes)
@@ -8,7 +8,9 @@ recipeRouter.get('/users/:id/recipe', getAllRecipesByUser)
 
 recipeRouter.get('/users/:id/recipe/public', getAllPublicRecipesByUser)
 
-recipeRouter.get('/users/:authorId/recipe/:id', getRecipeByUserById)
+recipeRouter.get('/recipe/:id', getPublicRecipeById)
+
+recipeRouter.get('/users/:authorId/recipe/:id', getRecipeByUser)
 
 recipeRouter.post('/recipe', createRecipe)
 
