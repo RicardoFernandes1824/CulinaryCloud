@@ -282,6 +282,8 @@ const updateRecipeByUser = async (req, response) => {
             coverImage = path;
         }
 
+        const ingredientsReceived = req.body.ingredients
+        
         const updateUserRecipe = await prisma.recipe.update({
             where: {
                 id: +req.params.id,
@@ -289,11 +291,33 @@ const updateRecipeByUser = async (req, response) => {
             },
             data: {
                 name: req.body.name,
-                ingredients: req.body.ingredients,
+                ingredients: {
+                    create: JSON.parse(ingredientsReceived).map((ingredient) => {
+                        if (ingredient.id) {
+                            return {
+                                ingredient: {
+                                    connect: {
+                                        id: ingredient.id
+                                    }
+                                },
+                                quantity: ingredient.quantity
+                            };
+                        }
+                        return {
+                            ingredient: {
+                                create: {
+                                    name: ingredient.name,
+                                }
+                            },
+                            quantity: ingredient.quantity
+                        };
+                    })
+
+                },
                 category: req.body.category,
                 notes: req.body.notes,
-                public: req.body.public,
-                coverImage: coverImage.split("./attachements/")[1]
+                public: req.body.public === "true",
+                coverImage: coverImage?.split("./attachements/")[1]
             },
         })
         response.json(updateUserRecipe)
@@ -333,7 +357,8 @@ const getPublicRecipeById = async (req, response) => {
                         ingredient: true
                     }
                 },
-                attachements: true
+                attachements: true,
+                author: true
             }
         });
         console.log(getUserRecipe)
@@ -357,7 +382,8 @@ const getRecipeByUser = async (req, response) => {
                         ingredient: true
                     }
                 },
-                attachements: true
+                attachements: true,
+                author: true
             }
         })
         response.json(getUserRecipe);
